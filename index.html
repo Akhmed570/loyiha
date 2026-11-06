@@ -43,3 +43,307 @@
   </button>
 </body>
 </html>
+
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JARVIS AI</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: radial-gradient(circle at top, #153b60, #050b18 70%);
+  color: white;
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 18px;
+}
+
+.app {
+  width: 100%;
+  max-width: 480px;
+  background: rgba(9, 23, 43, .94);
+  border: 1px solid #17618a;
+  border-radius: 22px;
+  padding: 22px;
+  box-shadow: 0 0 35px #0077aa33;
+}
+
+header { text-align: center; }
+
+.logo {
+  width: 90px;
+  height: 90px;
+  border: 3px solid #00d9ff;
+  border-radius: 50%;
+  margin: 10px auto;
+  display: grid;
+  place-items: center;
+  font-size: 35px;
+  color: #00e5ff;
+  box-shadow: 0 0 25px #00cfff88;
+}
+
+h1 {
+  color: #00e5ff;
+  letter-spacing: 5px;
+  margin-bottom: 5px;
+}
+
+.status {
+  color: #7eeaff;
+  font-size: 13px;
+}
+
+#chat {
+  height: 300px;
+  overflow-y: auto;
+  background: #071426;
+  border-radius: 14px;
+  padding: 12px;
+  margin: 20px 0;
+}
+
+.message {
+  padding: 11px 13px;
+  border-radius: 12px;
+  margin: 9px 0;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.jarvis {
+  background: #123451;
+  border-left: 3px solid #00d9ff;
+  margin-right: 25px;
+}
+
+.user {
+  background: #075b72;
+  margin-left: 25px;
+  text-align: right;
+}
+
+.controls {
+  display: flex;
+  gap: 8px;
+}
+
+input {
+  min-width: 0;
+  flex: 1;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid #17618a;
+  background: #071426;
+  color: white;
+  font-size: 16px;
+}
+
+button {
+  border: 0;
+  border-radius: 12px;
+  padding: 13px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.send {
+  background: #00d9ff;
+  color: #061526;
+  font-weight: bold;
+}
+
+.mic {
+  width: 100%;
+  margin-top: 10px;
+  background: #123451;
+  color: #00e5ff;
+  border: 1px solid #00a9d1;
+}
+
+.voice {
+  width: 100%;
+  margin-top: 8px;
+  background: #10263d;
+  color: white;
+  border: 1px solid #31506a;
+}
+
+button:active { opacity: .7; }
+
+footer {
+  text-align: center;
+  color: #668ba5;
+  font-size: 12px;
+  margin-top: 18px;
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<header>
+  <div class="logo">J</div>
+  <h1>JARVIS</h1>
+  <div class="status">● TIZIM ISHGA TUSHDI</div>
+  <p>Salom, Ahmadali! Men sening yordamchingman.</p>
+</header>
+
+<div id="chat">
+  <div class="message jarvis">
+    Salom! Men JARVIS. Menga xabar yoz yoki mikrofon tugmasini bos.
+  </div>
+</div>
+
+<div class="controls">
+  <input id="message" placeholder="Xabaringni yoz..." autocomplete="off">
+  <button class="send" onclick="sendMessage()">➤</button>
+</div>
+
+<button class="mic" onclick="listen()">🎙️ Ovoz bilan gapirish</button>
+<button class="voice" onclick="toggleVoice()">🔊 Ovozli javob: YOQILGAN</button>
+
+<footer>
+  JARVIS MINI • Bepul yordamchi • 1.0
+</footer>
+
+</div>
+
+<script>
+const chat = document.getElementById("chat");
+const input = document.getElementById("message");
+
+let voiceEnabled = true;
+
+function addMessage(text, type) {
+  const div = document.createElement("div");
+  div.className = "message " + type;
+  div.textContent = text;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function speak(text) {
+  if (!voiceEnabled || !("speechSynthesis" in window)) return;
+
+  speechSynthesis.cancel();
+
+  const speech = new SpeechSynthesisUtterance(text);
+  speech.lang = "uz-UZ";
+  speech.rate = 0.95;
+  speech.pitch = 1;
+
+  speechSynthesis.speak(speech);
+}
+
+function toggleVoice() {
+  voiceEnabled = !voiceEnabled;
+
+  document.querySelector(".voice").textContent =
+    voiceEnabled
+    ? "🔊 Ovozli javob: YOQILGAN"
+    : "🔇 Ovozli javob: O‘CHIRILGAN";
+
+  if (!voiceEnabled && "speechSynthesis" in window) {
+    speechSynthesis.cancel();
+  }
+}
+
+function getAnswer(text) {
+  const q = text.toLowerCase();
+
+  if (q.includes("salom") || q.includes("assalomu")) {
+    return "Va alaykum assalom! Qalaysan? Men JARVIS, xizmatga tayyorman.";
+  }
+
+  if (q.includes("isming") || q.includes("kimsan")) {
+    return "Men JARVIS MINI, Ahmadalining shaxsiy yordamchisiman.";
+  }
+
+  if (q.includes("vaqt") || q.includes("soat")) {
+    return "Hozirgi vaqt: " +
+      new Date().toLocaleTimeString("uz-UZ");
+  }
+
+  if (q.includes("sana") || q.includes("bugun")) {
+    return "Bugungi sana: " +
+      new Date().toLocaleDateString("uz-UZ");
+  }
+
+  if (q.includes("yordam")) {
+    return "Menga salom ber, vaqtni yoki sanani so‘ra. Men hozircha oddiy buyruqlar bilan ishlayman.";
+  }
+
+  if (q.includes("rahmat")) {
+    return "Arzimaydi, Ahmadali! Har doim yordam berishga tayyorman.";
+  }
+
+  if (q.includes("xayr")) {
+    return "Xayr, Ahmadali! Yana uchrashguncha!";
+  }
+
+  return "Bu savolga hozircha javob berishni bilmayman. Men JARVIS MINI ning bepul, oddiy versiyasiman.";
+}
+
+function sendMessage() {
+  const text = input.value.trim();
+  if (!text) return;
+
+  addMessage(text, "user");
+  input.value = "";
+
+  const answer = getAnswer(text);
+  addMessage(answer, "jarvis");
+  speak(answer);
+}
+
+input.addEventListener("keydown", function(event) {
+  if (event.key === "Enter") sendMessage();
+});
+
+function listen() {
+  const Recognition =
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition;
+
+  if (!Recognition) {
+    addMessage(
+      "Bu brauzerda ovoz orqali tanish funksiyasi ishlamayapti. Xabarni yozib yuborishing mumkin.",
+      "jarvis"
+    );
+    return;
+  }
+
+  const recognition = new Recognition();
+  recognition.lang = "uz-UZ";
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+
+  addMessage("Seni tinglayapman...", "jarvis");
+
+  recognition.onresult = function(event) {
+    input.value = event.results[0][0].transcript;
+    sendMessage();
+  };
+
+  recognition.onerror = function() {
+    addMessage(
+      "Mikrofon ishlamadi. Brauzerga mikrofon ruxsatini ber yoki xabar yoz.",
+      "jarvis"
+    );
+  };
+
+  recognition.start();
+}
+</script>
+</body>
+</html>
