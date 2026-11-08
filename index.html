@@ -4,85 +4,321 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#09090b">
 <title>JARVIS AI</title>
+
 <style>
+* {
+  box-sizing: border-box;
+}
+
 body {
-  background: #07111f;
-  color: #00eaff;
-  font-family: Arial;
-  text-align: center;
+  margin: 0;
+  min-height: 100vh;
+  background: #09090b;
+  color: #f4f4f5;
+  font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+}
+
+.app {
+  width: 100%;
+  max-width: 650px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   padding: 20px;
 }
-h1 { margin-top: 40px; }
+
+header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0 20px;
+  border-bottom: 1px solid #27272a;
+}
+
+.logo {
+  width: 45px;
+  height: 45px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: #18181b;
+  color: #60a5fa;
+  border: 1px solid #3f3f46;
+  font-size: 23px;
+  font-weight: bold;
+}
+
+h1 {
+  font-size: 20px;
+  margin: 0;
+  letter-spacing: 2px;
+}
+
+.status {
+  color: #4ade80;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+.welcome {
+  text-align: center;
+  margin: 55px 0 25px;
+}
+
+.welcome h2 {
+  font-size: 27px;
+  margin-bottom: 10px;
+}
+
+.welcome p {
+  color: #a1a1aa;
+  font-size: 14px;
+}
+
 #chat {
-  background: #102238;
-  padding: 15px;
-  height: 350px;
+  flex: 1;
+  min-height: 220px;
+  max-height: 55vh;
   overflow-y: auto;
-  border-radius: 15px;
-  text-align: left;
+  padding: 10px 0;
+}
+
+.message {
+  padding: 13px 16px;
+  border-radius: 16px;
+  margin: 12px 0;
+  line-height: 1.6;
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
+
+.jarvis {
+  background: #18181b;
+  border: 1px solid #27272a;
+  margin-right: 30px;
+}
+
+.user {
+  background: #1e3a5f;
+  margin-left: 30px;
+  text-align: right;
+}
+
+.controls {
+  display: flex;
+  gap: 8px;
+  padding: 10px;
+  background: #18181b;
+  border: 1px solid #3f3f46;
+  border-radius: 17px;
+}
+
+input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: white;
+  font-size: 16px;
+  padding: 10px;
+}
+
+button {
+  border: none;
+  border-radius: 12px;
+  padding: 12px 15px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.send {
+  background: #3b82f6;
   color: white;
 }
-input {
-  width: 68%;
-  padding: 13px;
-  border-radius: 10px;
-  border: none;
+
+.extra {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
 }
-button {
-  padding: 13px;
-  background: #00eaff;
-  border: none;
-  border-radius: 10px;
-  font-weight: bold;
+
+.extra button {
+  flex: 1;
+  background: #18181b;
+  color: #d4d4d8;
+  border: 1px solid #3f3f46;
+}
+
+button:active {
+  opacity: .7;
+}
+
+footer {
+  text-align: center;
+  color: #71717a;
+  font-size: 12px;
+  padding: 20px 0 5px;
 }
 </style>
 </head>
+
 <body>
+<div class="app">
 
-<h1>🤖 JARVIS AI</h1>
-<p>Ahmadalining shaxsiy yordamchisi</p>
+<header>
+  <div class="logo">J</div>
+  <div>
+    <h1>JARVIS</h1>
+    <div class="status">● Tizim tayyor</div>
+  </div>
+</header>
 
-<div id="chat">
-<p>JARVIS: Salom Ahmadali! Men sizning yordamchingizman.</p>
+<div class="welcome">
+  <h2>Salom, Ahmadali!</h2>
+  <p>Men sizning shaxsiy AI yordamchingizman.</p>
 </div>
 
-<br>
-<input id="msg" placeholder="Xabar yozing...">
-<button onclick="send()">Yuborish</button>
+<div id="chat">
+  <div class="message jarvis">
+    Salom, Ahmadali! Men JARVIS. Sizga qanday yordam beray?
+  </div>
+</div>
+
+<div class="controls">
+  <input id="message"
+    placeholder="JARVISga xabar yozing..."
+    autocomplete="off">
+  <button class="send" onclick="sendMessage()">➤</button>
+</div>
+
+<div class="extra">
+  <button onclick="listen()">🎙️ Mikrofon</button>
+  <button onclick="toggleVoice()" id="voiceButton">
+    🔊 Ovoz: ON
+  </button>
+</div>
+
+<footer>
+  JARVIS AI • Ahmadalining yordamchisi
+</footer>
+
+</div>
 
 <script>
-function send() {
-  let input = document.getElementById("msg");
-  let chat = document.getElementById("chat");
-  let text = input.value.trim();
+const chat = document.getElementById("chat");
+const input = document.getElementById("message");
 
-  if (!text) return;
+let voiceEnabled = true;
 
-  chat.innerHTML += "<p><b>Siz:</b> " + escapeHTML(text) + "</p>";
+function addMessage(text, type) {
+  const div = document.createElement("div");
+  div.className = "message " + type;
+  div.textContent = text;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
 
-  let answer = "Hozircha bu savolga javob berishni bilmayman.";
+function speak(text) {
+  if (!voiceEnabled || !window.speechSynthesis) return;
 
-  if (text.toLowerCase().includes("salom")) {
-    answer = "Salom Ahmadali! Sizga qanday yordam beray?";
-  } else if (text.toLowerCase().includes("isming")) {
-    answer = "Men JARVIS, Ahmadalining yordamchisiman.";
-  } else if (text.toLowerCase().includes("qalaysan")) {
-    answer = "Rahmat, yaxshiman! Siz-chi?";
+  speechSynthesis.cancel();
+
+  const speech = new SpeechSynthesisUtterance(text);
+  speech.lang = "uz-UZ";
+  speech.rate = 0.95;
+
+  speechSynthesis.speak(speech);
+}
+
+function toggleVoice() {
+  voiceEnabled = !voiceEnabled;
+
+  document.getElementById("voiceButton").textContent =
+    voiceEnabled ? "🔊 Ovoz: ON" : "🔇 Ovoz: OFF";
+
+  if (!voiceEnabled && window.speechSynthesis) {
+    speechSynthesis.cancel();
+  }
+}
+
+function getAnswer(text) {
+  const q = text.toLowerCase();
+
+  if (q.includes("salom") || q.includes("assalomu")) {
+    return "Va alaykum assalom, Ahmadali! Sizga qanday yordam beray?";
   }
 
-  chat.innerHTML += "<p><b>JARVIS:</b> " + answer + "</p>";
-  chat.scrollTop = chat.scrollHeight;
-  input.value = "";
+  if (q.includes("isming") || q.includes("kimsan")) {
+    return "Men JARVIS, Ahmadalining shaxsiy yordamchisiman.";
+  }
+
+  if (q.includes("vaqt") || q.includes("soat")) {
+    return "Hozirgi vaqt: " +
+      new Date().toLocaleTimeString("uz-UZ");
+  }
+
+  if (q.includes("sana") || q.includes("bugun")) {
+    return "Bugungi sana: " +
+      new Date().toLocaleDateString("uz-UZ");
+  }
+
+  if (q.includes("rahmat")) {
+    return "Arzimaydi, Ahmadali! Har doim yordam berishga tayyorman.";
+  }
+
+  if (q.includes("xayr")) {
+    return "Xayr, Ahmadali! Yana uchrashguncha.";
+  }
+
+  return "Bu savolga hozircha javob berishni bilmayman. Tez orada menga haqiqiy AI imkoniyatlarini qo‘shamiz.";
 }
 
-function escapeHTML(text) {
-  return text.replace(/[&<>"']/g, c => ({
-    "&":"&amp;", "<":"&lt;", ">":"&gt;",
-    '"':"&quot;", "'":"&#39;"
-  })[c]);
+function sendMessage() {
+  const text = input.value.trim();
+  if (!text) return;
+
+  addMessage(text, "user");
+  input.value = "";
+
+  const answer = getAnswer(text);
+  addMessage(answer, "jarvis");
+  speak(answer);
+}
+
+input.addEventListener("keydown", function(event) {
+  if (event.key === "Enter") sendMessage();
+});
+
+function listen() {
+  const Recognition =
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition;
+
+  if (!Recognition) {
+    addMessage("Ovozli tanish bu brauzerda mavjud emas. Xabarni yozib yuboring.", "jarvis");
+    return;
+  }
+
+  const recognition = new Recognition();
+  recognition.lang = "uz-UZ";
+  recognition.interimResults = false;
+
+  recognition.onresult = function(event) {
+    input.value = event.results[0][0].transcript;
+    sendMessage();
+  };
+
+  recognition.onerror = function() {
+    addMessage("Mikrofon ishlamadi. Ruxsatlarni tekshiring.", "jarvis");
+  };
+
+  recognition.start();
 }
 </script>
-
 </body>
 </html>
